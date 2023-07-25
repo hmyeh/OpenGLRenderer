@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{e2bef8ad-b0f3-48dc-b5f7-af2c916c6b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{1141c70d-fdaa-4ce6-9b87-b19a2c0712b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\glad\src\gl.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\imgui\imgui_impl_glfw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\imgui\imgui_impl_opengl3.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imgui_impl_glfw.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imgui_impl_opengl3.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\lighting.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\lighting.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\transparent.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\transparent.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\screen.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\screen.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\normals.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\normals.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\normals.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\instance.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\instance.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\imgui\imgui.natstepfilter">
+      <Filter>imgui</Filter>
+    </None>
+    <None Include="..\src\blinn_phong.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\blinn_phong.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\depthmap.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\depthmap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\depthcubemap.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\depthcubemap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\depthcubemap.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\skybox.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\skybox.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\g_buffer.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\g_buffer.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\deferred_lighting.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\deferred_lighting.frag">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\src\imgui\imgui.natvis">
+      <Filter>imgui</Filter>
+    </Natvis>
+  </ItemGroup>
+</Project>
