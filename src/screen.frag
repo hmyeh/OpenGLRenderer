@@ -6,6 +6,7 @@ in vec2 TexCoords;
 uniform sampler2D screenTexture;
 uniform mat3 kernel;
 uniform float exposure;
+uniform float gamma;
 
 const float offset = 1.0 / 300.0;  
 
@@ -38,6 +39,8 @@ void main()
     
     // Simple exposure Tone mapping HDR
     vec3 mapped = vec3(1.0) - exp(-col * exposure);
+    // Gamma correction
+    mapped = pow(mapped, vec3(1.0 / gamma));
 
     FragColor = vec4(mapped, 1.0);
 } 

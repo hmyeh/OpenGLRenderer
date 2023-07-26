@@ -13,7 +13,7 @@ private:
 	unsigned int texture_id;
 
 public:
-	Texture(std::string file_location);
+	Texture(std::string file_location, bool sRGB = false);
 	~Texture();
 
 	void bind(GLenum tex_unit);

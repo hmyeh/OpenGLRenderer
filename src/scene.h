@@ -54,6 +54,8 @@ public:
     // TODO: fix the two different draw calls
     void draw(Shader& shader);
     void draw();
+    // Special shaders for specific objects different from standard lighting
+    void specialShadersDraw();
 
     void bindLightsData(Shader& shader);
     void computeShadowMaps();

@@ -171,8 +171,7 @@ void main()
     float shadow = DirLightShadowCalculation(frag_in.FragPosLightSpace); 
 
     // phase 1: Directional lighting
-    vec3 result = vec3(0.0);
-    //vec3 result = CalcDirLight(dirLight, norm, viewDir, shadow);
+    vec3 result = CalcDirLight(dirLight, norm, viewDir, shadow);
     // phase 2: Point lights
     for(int i = 0; i < NR_POINT_LIGHTS; i++) {
         float pointShadow = PointLightShadowCalculation(frag_in.FragPos, i);

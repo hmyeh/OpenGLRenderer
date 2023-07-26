@@ -155,7 +155,7 @@ int main() {
 
         static bool screen_blur = false;
         static bool visualize_normals = false;
-        //static float gamma = 2.2f;
+        static float gamma = 2.2f;
         static float exposure = 1.0f;
         static glm::mat3 temp_kernel(
             0, 0, 0,
@@ -168,7 +168,9 @@ int main() {
         if (ImGui::Checkbox("Visualize Normals", &visualize_normals)) {
             scene.setVisualizeNormals(visualize_normals);
         }
-        //ImGui::SliderFloat("Gamma Correction", &gamma, 0.0f, 5.0f);
+        if (ImGui::SliderFloat("Gamma Correction", &gamma, 0.0f, 5.0f)) {
+            renderer.setGamma(gamma);
+        }
         if (ImGui::SliderFloat("HDR Exposure", &exposure, 0.0f, 10.0f)) {
             renderer.setExposure(exposure);
         }

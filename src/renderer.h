@@ -28,6 +28,9 @@ private:
 	// Forward screen shader
 	Shader screenShader = Shader("../src/screen.vert", "../src/screen.frag");
 
+	// Blinn phong shader
+	Shader blinnPhongShader = Shader("../src/blinn_phong.vert", "../src/blinn_phong.frag");
+
 	// Debug skybox shader
 	Shader skyboxShader = Shader("../src/skybox.vert", "../src/skybox.frag");
 
@@ -88,6 +91,8 @@ private:
 		 1.0f, -1.0f,  1.0f
 	};
 
+	// Gamma correction
+	float gamma = 2.2;
 	// Simple HDR tone mapping
 	float exposure = 1.0;
 	// Post-processing kernel convolution
@@ -123,6 +128,7 @@ public:
 
 	void render(Scene& scene, RenderType renderType);
 
+	void setGamma(float gamma);
 	void setExposure(float exposure);
 	void setKernel(glm::mat3 kernel);
 
@@ -141,6 +147,8 @@ private:
 	void setupForwardResources();
 	// Forward rendering
 	void forward(Scene& scene);
+
+	void postProcess();
 
 	//TESTING FOR CUBEMAPS
 	void setupDebugCubemapResources();

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <stdexcept>
 
-Texture::Texture(std::string file_location) : file_location(file_location) {
+Texture::Texture(std::string file_location, bool sRGB) : file_location(file_location) {
 	// load and generate the texture
 	int width, height, num_channels;
 	//if (!std::filesystem::exists(file_location)) {
@@ -23,17 +23,31 @@ Texture::Texture(std::string file_location) : file_location(file_location) {
 	}
 
 	GLenum format = GL_RGB;
-	if (num_channels == 1)
+	GLenum format2 = GL_RGB;
+	if (num_channels == 1) {
 		format = GL_RED;
-	else if (num_channels == 3)
+		format2 = GL_RED;
+	}
+	else if (num_channels == 3) {
 		format = GL_RGB;
-	else if (num_channels == 4)
+		format2 = GL_RGB;
+		if (sRGB) {
+			format = GL_SRGB;
+		}
+	}
+	else if (num_channels == 4) {
 		format = GL_RGBA;
+		format2 = GL_RGBA;
+		if (sRGB) {
+			format = GL_SRGB_ALPHA;
+		}
+	}
+
 
 	// Setup GL tex
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format2, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	
 	// set the texture wrapping/filtering options (on the currently bound texture object)

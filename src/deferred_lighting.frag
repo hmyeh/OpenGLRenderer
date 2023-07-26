@@ -38,7 +38,7 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform vec3 viewPos;
-float shininess = 32.0;
+const float shininess = 32.0;
 // Directional light shadowmap
 uniform sampler2D depthMap;
 // Point light shadowmaps

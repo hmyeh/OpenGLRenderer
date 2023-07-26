@@ -47,10 +47,10 @@ void Scene::draw(Shader& shader) {
 
 void Scene::draw() {
     // draw the lamp object
-    lightCubeShader.use();
-    for (unsigned int idx = 0; idx < lightingManager.getNumPointLights(); idx++) {
-        cube->draw(lightCubeShader, lightingManager.getPointLight(idx).position, glm::vec3(0.2f));
-    }
+    //lightCubeShader.use();
+    //for (unsigned int idx = 0; idx < lightingManager.getNumPointLights(); idx++) {
+    //    cube->draw(lightCubeShader, lightingManager.getPointLight(idx).position, glm::vec3(0.2f));
+    //}
 
 
     blinnPhongShader.use();
@@ -77,6 +77,20 @@ void Scene::draw() {
     //{
     //    cube.draw(transparentShader, it->second, glm::vec3(0.2f));
     //}
+
+    //normals
+    if (visualize_normals) {
+        normalsShader.use();
+        stanford_dragon->draw(normalsShader, glm::vec3(0.0f), glm::vec3(0.01));
+    }
+}
+
+void Scene::specialShadersDraw() {
+    // draw the lamp object
+    lightCubeShader.use();
+    for (unsigned int idx = 0; idx < lightingManager.getNumPointLights(); idx++) {
+        cube->draw(lightCubeShader, lightingManager.getPointLight(idx).position, glm::vec3(0.2f));
+    }
 
     //normals
     if (visualize_normals) {

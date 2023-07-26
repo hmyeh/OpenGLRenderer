@@ -48,6 +48,10 @@ void Renderer::render(Scene& scene, RenderType renderType) {
 	};
 }
 
+void Renderer::setGamma(float gamma) {
+	this->gamma = gamma;
+}
+
 void Renderer::setExposure(float exposure) {
 	this->exposure = exposure;
 }
@@ -166,9 +170,10 @@ void Renderer::deferred(Scene& scene) {
 
 	// deferred lighting pass
 	// Second pass
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+	glBindFramebuffer(GL_FRAMEBUFFER, forwardFbo); // back to default 0
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_FRAMEBUFFER_SRGB);
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
 	glActiveTexture(GL_TEXTURE1);
@@ -180,6 +185,7 @@ void Renderer::deferred(Scene& scene) {
 	deferredLightingShader.setInt("gPosition", 0);
 	deferredLightingShader.setInt("gNormal", 1);
 	deferredLightingShader.setInt("gAlbedoSpec", 2);
+	deferredLightingShader.setVec3("viewPos", camera->Position);
 	// Bind shadowmap data
 	scene.bindLightsData(deferredLightingShader);
 
@@ -187,7 +193,19 @@ void Renderer::deferred(Scene& scene) {
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glDisable(GL_FRAMEBUFFER_SRGB);
+	// FORWARD RENDERING PART
+	// Copy Depth buffer from g-Buffer
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, forwardFbo); // write to default framebuffer
+	glBlitFramebuffer(
+		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+	);
+	glBindFramebuffer(GL_FRAMEBUFFER, forwardFbo);
+
+	// Special shader drawings
+	scene.specialShadersDraw();
+
+	this->postProcess();
 }
 
 // Setup for post-processing screen quad
@@ -242,27 +260,42 @@ void Renderer::forward(Scene& scene) {
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	scene.draw();
+	blinnPhongShader.use();
+	blinnPhongShader.setVec3("viewPos", camera->Position);
+	// Bind shadowmap data
+	scene.bindLightsData(deferredLightingShader);
+	// Draw scene with blinn phong shader
+	scene.draw(blinnPhongShader);
+	
+	// Special shader drawings
+	scene.specialShadersDraw();
 
-	// Second pass
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+	this->postProcess();
+}
+
+void Renderer::postProcess() {
+	// Postprocessing
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_FRAMEBUFFER_SRGB);
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	screenShader.use();
 	screenShader.setMat3("kernel", kernel);
 	screenShader.setFloat("exposure", exposure);
+	screenShader.setFloat("gamma", gamma);
 	glBindVertexArray(quadVAO);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, forwardColorbuffer); //scene.dir_light.getDepthMap());//
+	glBindTexture(GL_TEXTURE_2D, forwardColorbuffer);//forwardColorbuffer); //scene.dir_light.getDepthMap());//
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glDisable(GL_FRAMEBUFFER_SRGB);
+	//glDisable(GL_FRAMEBUFFER_SRGB);
+	glEnable(GL_DEPTH_TEST);
+
 }
 
 //TESTING FOR CUBEMAPS
