@@ -1,20 +1,20 @@
 #include "scene.h"
 
 Scene::Scene(Camera* camera) : camera(camera) {
-    this->cube = std::unique_ptr<Mesh>(new Cube());
+    this->cube = std::unique_ptr<Mesh>(new DefaultCube());
     this->plane = std::unique_ptr<Mesh>(new Plane());
     this->stanford_dragon = std::unique_ptr<Mesh>(new TriangleMesh("../resources/xyzrgb_dragon.obj"));
 
     //hardcoded scene
-    items.push_back({ glm::vec3(0.0f, 0.5f, -10.0f), glm::vec3(0.2f), cube.get() });
-    items.push_back({ glm::vec3(0.0f, -0.05f, 0.0f), glm::vec3(10.0f), plane.get() });
+    items.push_back({ glm::vec3(0.0f, 0.5f, -2.0f), glm::vec3(0.2f), cube.get() });
+    items.push_back({ glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(10.0f), plane.get() });
     items.push_back({ glm::vec3(0.0f), glm::vec3(0.01f), stanford_dragon.get() });
 
     // hardcoded lights
-    lightingManager.setDirectionalLight(DirectionalLight(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(0.05f), glm::vec3(0.4f), glm::vec3(0.5f)));
-    lightingManager.addPointLight(PointLight(glm::vec3(-2.0f, 4.0f, -1.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, 25.0f));
-    lightingManager.addPointLight(PointLight(glm::vec3(-4.0f, 2.0f, -12.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, 25.0f));
-    lightingManager.addPointLight(PointLight(glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, 25.0f));
+    lightingManager.setDirectionalLight(DirectionalLight(glm::vec3(0.0f, -4.0f, 0.0f), glm::vec3(0.05f), glm::vec3(1.0f), glm::vec3(0.5f)));
+    lightingManager.addPointLight(PointLight(glm::vec3(0.5f, 0.25f, 0.875f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, 25.0f));
+    lightingManager.addPointLight(PointLight(glm::vec3(-4.0f, 1.0f, -4.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, 25.0f));
+    lightingManager.addPointLight(PointLight(glm::vec3(0.0f, 1.0f, -2.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, 25.0f));
     // Setup GL UBO buffers
     lightingManager.setupGlBuffers();
 
@@ -45,22 +45,11 @@ void Scene::draw(Shader& shader) {
 }
 
 
-void Scene::draw() {
+void Scene::specialShadersDraw() {
     // draw the lamp object
-    //lightCubeShader.use();
-    //for (unsigned int idx = 0; idx < lightingManager.getNumPointLights(); idx++) {
-    //    cube->draw(lightCubeShader, lightingManager.getPointLight(idx).position, glm::vec3(0.2f));
-    //}
-
-
-    blinnPhongShader.use();
-
-    lightingManager.bind(blinnPhongShader, this->bbox);
-
-    blinnPhongShader.setVec3("viewPos", camera->Position);
-
-    for (const SceneItem& item : items) {
-        item.mesh->draw(blinnPhongShader, item.position, item.scale);
+    lightCubeShader.use();
+    for (unsigned int idx = 0; idx < lightingManager.getNumPointLights(); idx++) {
+        cube->draw(lightCubeShader, lightingManager.getPointLight(idx).position, glm::vec3(0.05f));
     }
 
     //// TRANSPARENT OBJECTS
@@ -77,20 +66,6 @@ void Scene::draw() {
     //{
     //    cube.draw(transparentShader, it->second, glm::vec3(0.2f));
     //}
-
-    //normals
-    if (visualize_normals) {
-        normalsShader.use();
-        stanford_dragon->draw(normalsShader, glm::vec3(0.0f), glm::vec3(0.01));
-    }
-}
-
-void Scene::specialShadersDraw() {
-    // draw the lamp object
-    lightCubeShader.use();
-    for (unsigned int idx = 0; idx < lightingManager.getNumPointLights(); idx++) {
-        cube->draw(lightCubeShader, lightingManager.getPointLight(idx).position, glm::vec3(0.2f));
-    }
 
     //normals
     if (visualize_normals) {

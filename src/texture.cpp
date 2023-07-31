@@ -12,10 +12,10 @@ Texture::Texture(std::string file_location, bool sRGB) : file_location(file_loca
 	int width, height, num_channels;
 	//if (!std::filesystem::exists(file_location)) {
 	//	std::cout << "Failed to load texture" << std::endl;
-	//	throw std::exception("sd");
+	//	throw std::exception("");
 	//}
 	//stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char* data = stbi_load(file_location.c_str(), &width, &height, &num_channels, 0);
+	unsigned char* data = stbi_load(file_location.c_str(), &width, &height, &num_channels, 0); // exception fix: 0 -> 4
 	
 	if (!data) {
 		std::cout << "Failed to load texture" << std::endl;
@@ -24,11 +24,7 @@ Texture::Texture(std::string file_location, bool sRGB) : file_location(file_loca
 
 	GLenum format = GL_RGB;
 	GLenum format2 = GL_RGB;
-	if (num_channels == 1) {
-		format = GL_RED;
-		format2 = GL_RED;
-	}
-	else if (num_channels == 3) {
+	if (num_channels == 3) {
 		format = GL_RGB;
 		format2 = GL_RGB;
 		if (sRGB) {

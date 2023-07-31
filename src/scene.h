@@ -20,7 +20,7 @@ struct SceneItem {
 class Scene {
 private:
     Camera* camera;
-
+public:
     //lights: dirlight, pointlight
     LightingManager lightingManager;
 
@@ -28,7 +28,7 @@ private:
     std::unique_ptr<Mesh> cube;
     std::unique_ptr<Mesh> plane;
     std::unique_ptr<Mesh> stanford_dragon;
-    
+private:
     // Bounding box (max x, max y, max z)
     glm::vec3 bbox;
     
@@ -36,14 +36,10 @@ private:
     std::vector<SceneItem> items;
 
     // Create and compile the shaders
-    Shader blinnPhongShader = Shader("../src/blinn_phong.vert", "../src/blinn_phong.frag");
-    Shader lightCubeShader = Shader("../src/lighting.vert", "../src/lighting.frag");
-    Shader transparentShader = Shader("../src/transparent.vert", "../src/transparent.frag");
-    Shader screenShader = Shader("../src/screen.vert", "../src/screen.frag");
-    Shader normalsShader = Shader("../src/normals.vert", "../src/normals.geom", "../src/normals.frag");
-    Shader instanceShader = Shader("../src/instance.vert", "../src/instance.frag");
-    Shader depthMapShader = Shader("../src/depthmap.vert", "../src/depthmap.frag");
-    Shader depthCubeMapShader = Shader("../src/depthcubemap.vert", "../src/depthcubemap.geom", "../src/depthcubemap.frag");
+    Shader lightCubeShader = Shader("lighting.vert", "lighting.frag");
+    Shader normalsShader = Shader("normals.vert", "normals.geom", "normals.frag");
+    Shader depthMapShader = Shader("depthmap.vert", "depthmap.frag");
+    Shader depthCubeMapShader = Shader("depthcubemap.vert", "depthcubemap.geom", "depthcubemap.frag");
     
     bool visualize_normals = false;
 
@@ -51,9 +47,7 @@ private:
 public:
     Scene(Camera* camera);
 
-    // TODO: fix the two different draw calls
     void draw(Shader& shader);
-    void draw();
     // Special shaders for specific objects different from standard lighting
     void specialShadersDraw();
 

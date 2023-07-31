@@ -9,10 +9,12 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <string>
 
 
 class Shader
 {
+    const std::string resources_path = "../src/shaders/";
 
     enum class ShaderType {
         VERTEX,

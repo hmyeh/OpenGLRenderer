@@ -69,6 +69,9 @@
     <ClCompile Include="..\src\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\irradiancemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\shader.h">
@@ -119,81 +122,108 @@
     <ClInclude Include="..\src\renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\irradiancemap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\lighting.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\lighting.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\transparent.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\transparent.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\screen.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\screen.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\normals.geom">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\normals.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\normals.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\instance.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\src\instance.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\src\imgui\imgui.natstepfilter">
       <Filter>imgui</Filter>
     </None>
-    <None Include="..\src\blinn_phong.vert">
+    <None Include="..\src\shaders\blinn_phong.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\blinn_phong.frag">
+    <None Include="..\src\shaders\blinn_phong.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\depthmap.vert">
+    <None Include="..\src\shaders\deferred_lighting.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\depthmap.frag">
+    <None Include="..\src\shaders\deferred_lighting.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\depthcubemap.vert">
+    <None Include="..\src\shaders\depthcubemap.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\depthcubemap.frag">
+    <None Include="..\src\shaders\depthcubemap.geom">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\depthcubemap.geom">
+    <None Include="..\src\shaders\depthcubemap.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\skybox.vert">
+    <None Include="..\src\shaders\depthmap.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\skybox.frag">
+    <None Include="..\src\shaders\depthmap.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\g_buffer.vert">
+    <None Include="..\src\shaders\g_buffer.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\g_buffer.frag">
+    <None Include="..\src\shaders\g_buffer.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\deferred_lighting.vert">
+    <None Include="..\src\shaders\instance.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\src\deferred_lighting.frag">
+    <None Include="..\src\shaders\instance.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\lighting.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\lighting.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\normals.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\normals.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\normals.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\pbr.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\pbr.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\screen.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\screen.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\skybox.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\skybox.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\transparent.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\transparent.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\cubemap.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\cubemap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\irradiance_convolution.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\prefilter_convolution.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\precompute_brdf.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\src\shaders\precompute_brdf.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

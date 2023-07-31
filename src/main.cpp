@@ -17,8 +17,8 @@ Camera camera;
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-int width = 800;
-int height = 600;
+int width = 1280;
+int height = 720;
 float lastX = (float)width / 2.0f;
 float lastY = (float)height / 2.0f;
 
@@ -175,8 +175,35 @@ int main() {
             renderer.setExposure(exposure);
         }
 
-        static int current_render_type = RenderType::DEFERRED;
-        const char* render_type_names[] = { "Deferred", "Forward", "Debug Cube Depthmap"};
+        // testing pbr
+        static float metallic = 0.0;
+        static float roughness = 0.025f;
+        static float ao = 1.0f;
+        if (ImGui::SliderFloat("metallic", &metallic, 0.0f, 1.0f)) {
+            scene.stanford_dragon->setMetallic(metallic);
+        }
+        if (ImGui::SliderFloat("roughness", &roughness, 0.0f, 1.0f)) {
+            scene.stanford_dragon->setRoughness(roughness);
+        }
+        if (ImGui::SliderFloat("ao", &ao, 0.0f, 1.0f)) {
+            scene.stanford_dragon->setAO(ao);
+        }
+        
+        static float lightPosX = 0.5f;
+        static float lightPosY = 0.25f;
+        static float lightPosZ = 0.875f;
+        if (ImGui::SliderFloat("light x", &lightPosX, -5.0f, 5.0f)) {
+            scene.lightingManager.setPointLightPosition(0, glm::vec3(lightPosX, lightPosY, lightPosZ));
+        }
+        if (ImGui::SliderFloat("light y", &lightPosY, -5.0f, 5.0f)) {
+            scene.lightingManager.setPointLightPosition(0, glm::vec3(lightPosX, lightPosY, lightPosZ));
+        }
+        if (ImGui::SliderFloat("light z", &lightPosZ, -5.0f, 5.0f)) {
+            scene.lightingManager.setPointLightPosition(0, glm::vec3(lightPosX, lightPosY, lightPosZ));
+        }
+
+        static int current_render_type = RenderType::FORWARD;
+        const char* render_type_names[] = { "Deferred", "Forward", "Debug Depth Cubemap", "Debug Irradiance Cubemap", "Debug Irradiance BRDF LUT" };
         const char* current_render_type_name = (current_render_type >= 0 && current_render_type < RenderType::COUNT) ? render_type_names[current_render_type] : "Unknown";
         ImGui::SliderInt("Render Type", &current_render_type, 0, RenderType::COUNT - 1, current_render_type_name);
 

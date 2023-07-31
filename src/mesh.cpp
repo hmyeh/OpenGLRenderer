@@ -10,29 +10,64 @@
 Mesh::~Mesh() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
 }
 
-void Mesh::setupGlBuffers() {
+glm::vec3 Mesh::computeBoundingBox(glm::vec3 scale) {
+    return glm::vec3(0.0f);
+}
+
+
+// Screen Quad
+ScreenQuad::ScreenQuad() {
+    this->setupGlBuffers();
+}
+
+void ScreenQuad::setupGlBuffers() {
     // create buffers/arrays
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
     // load data into vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // A great thing about structs is that their memory layout is sequential for all its items.
-    // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
-    // again translates to 3/2 floats which translates to a byte array.
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-    if (!indices.empty()) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-    }
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 
     // set the vertex attribute pointers
+    // vertex Positions
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ScreenVertex), (void*)0);
+    // vertex texture coords
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ScreenVertex), (void*)offsetof(ScreenVertex, tex_coords));
+    glBindVertexArray(0);
+}
+
+void ScreenQuad::draw(Shader& shader, const glm::vec3 & position, const glm::vec3 & scale) {
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+}
+
+unsigned int& ScreenQuad::getVAO() {
+    return VAO;
+}
+
+// Abstract Cube
+
+Cube::Cube() {
+    this->setupGlBuffers();
+}
+
+void Cube::setupGlBuffers() {
+    // create buffers/arrays
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    // load data into vertex buffers
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+
     // vertex Positions
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -45,156 +80,90 @@ void Mesh::setupGlBuffers() {
     glBindVertexArray(0);
 }
 
-glm::vec3 Mesh::computeBoundingBox(glm::vec3 scale) {
+glm::vec3 Cube::computeBoundingBox(glm::vec3 scale) {
     glm::vec3 bbox(0.0f);
-    for (unsigned int i = 0; i < vertices.size(); i++) {
-        glm::vec3 scaled_pos = scale * vertices[i].pos;
+    for (const Vertex& vertex : vertices) {
+        glm::vec3 scaled_pos = scale * vertex.pos;
         bbox = glm::max(bbox, glm::abs(scaled_pos));
     }
     return bbox;
 }
 
-bool Mesh::isTransparent() { return transparent; }
 
-// HARDCODED CUBE
+// Skybox
+Skybox::Skybox() : Cube() { }
 
-Cube::Cube() {
-    this->vertices = {
-        // positions                    //normals                   // texture coords
-        { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 0.0f) },
-        { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 0.0f) },
-
-        { glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec3(0.0f,  0.0f, 1.0f),   glm::vec2(0.0f, 0.0f) },
-        { glm::vec3(0.5f, -0.5f,  0.5f),  glm::vec3(0.0f,  0.0f, 1.0f),   glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(0.5f,  0.5f,  0.5f),  glm::vec3(0.0f,  0.0f, 1.0f),   glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(0.5f,  0.5f,  0.5f),  glm::vec3(0.0f,  0.0f, 1.0f),   glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec3(0.0f,  0.0f, 1.0f),   glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec3(0.0f,  0.0f, 1.0f),   glm::vec2(0.0f, 0.0f) },
-
-        { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f),  glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 0.0f) },
-        { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-
-        { glm::vec3(0.5f,  0.5f,  0.5f),  glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(0.5f,  0.5f, -0.5f),  glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(0.5f, -0.5f, -0.5f),  glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(0.5f, -0.5f, -0.5f),  glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(0.5f, -0.5f,  0.5f),  glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 0.0f) },
-        { glm::vec3(0.5f,  0.5f,  0.5f),  glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-
-        { glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(0.5f, -0.5f, -0.5f),  glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(0.5f, -0.5f,  0.5f),  glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(0.5f, -0.5f,  0.5f),  glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(0.0f, 0.0f) },
-        { glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-
-        { glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        { glm::vec3(0.5f,  0.5f, -0.5f),  glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(1.0f, 1.0f) },
-        { glm::vec3(0.5f,  0.5f,  0.5f),  glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(0.5f,  0.5f,  0.5f),  glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(1.0f, 0.0f) },
-        { glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(0.0f, 0.0f) },
-        { glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(0.0f, 1.0f) }
-    };
-
-    this->setupGlBuffers();
-
-    // TODO: place this elsewhere
-    // Instancing arrays (per instance stuff)
-    std::vector<glm::vec3> translations(100);
-    for (unsigned int i = 0; i < translations.size(); i++) {
-        translations[i] = glm::vec3(0.05f * i);
-    }
-
-    glGenBuffers(1, &instanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * translations.size(), &translations[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+void Skybox::draw(Shader& shader, const glm::vec3 & position, const glm::vec3 & scale) {
     glBindVertexArray(VAO);
-    glEnableVertexAttribArray(3);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor(3, 1);
-}
-
-void Cube::draw(Shader& shader, const glm::vec3& position, const glm::vec3& scale) {
-    // Bind textures
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        this->textures[i]->bind(GL_TEXTURE0 + i);
-    }
-
-    glBindVertexArray(VAO);
-    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(scale));
-    model = glm::translate(model, position);
-    shader.setMat4("model", model);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 }
 
-void Cube::instancedDraw(Shader& shader, const glm::vec3& position, const glm::vec3& scale) {
-    // Bind textures
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        this->textures[i]->bind(GL_TEXTURE0 + i);
-    }
+const glm::mat4& Skybox::getProjectionMatrix() {
+    return this->projection;
+}
 
-    glBindVertexArray(VAO);
-    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(scale));
-    model = glm::translate(model, position);
-    shader.setMat4("model", model);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 100);
-    glBindVertexArray(0);
+const glm::mat4& Skybox::getViewMatrix(int index) {
+    return this->views[index];
+}
+
+unsigned int& Skybox::getVAO() {
+    return VAO;
 }
 
 // HARDCODED PLANE
 
-Plane::Plane() {
-    this->vertices = {
-        // positions                    //normals                   // texture coords
-        { glm::vec3(0.5f, 0.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(2.0f, 0.0f) },
-        { glm::vec3(-0.5f, 0.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f) },
-        { glm::vec3(-0.5f, 0.0f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 2.0f) },
-
-        { glm::vec3(0.5f, 0.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(2.0f, 0.0f) },
-        { glm::vec3(-0.5f, 0.0f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 2.0f) },
-        { glm::vec3(0.5f, 0.0f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(2.0f, 2.0f) }
-    };
-
-    this->textures.push_back(std::make_unique<Texture>("../resources/floor.jpg"));
-    this->textures.push_back(std::make_unique<Texture>("../resources/floor.jpg"));
-
-    this->setupGlBuffers();
-}
+Plane::Plane() : Cube() {}
 
 void Plane::draw(Shader& shader, const glm::vec3& position, const glm::vec3& scale) {
-    // Bind textures
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        this->textures[i]->bind(GL_TEXTURE0 + i);
-    }
+    // Set material
+    tex.bind(GL_TEXTURE0);
+    shader.setInt("material.albedo", 0);
+    shader.setFloat("material.metallic", material.metallic);
+    shader.setFloat("material.roughness", material.roughness);
+    shader.setFloat("material.ao", material.ao);
 
-    // floor
-    shader.setInt("material.diffuse", 0);
-    shader.setInt("material.specular", 1);
-    shader.setFloat("material.shininess", 32.0f);
+    // Set Model matrix and draw
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+    model = glm::scale(model, glm::vec3(scale) * unit_scale);
+    shader.setMat4("model", model);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+}
+
+
+// Default Cube
+DefaultCube::DefaultCube() : Cube() {}
+
+void DefaultCube::draw(Shader& shader, const glm::vec3& position, const glm::vec3& scale) {
+    // Set material
+    tex.bind(GL_TEXTURE0);
+    shader.setInt("material.albedo", 0);
+    shader.setFloat("material.metallic", material.metallic);
+    shader.setFloat("material.roughness", material.roughness);
+    shader.setFloat("material.ao", material.ao);
+
+    // Set Model matrix
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+    model = glm::scale(model, glm::vec3(scale));
+    shader.setMat4("model", model);
 
     glBindVertexArray(VAO);
-    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(scale));
-    model = glm::translate(model, position);
-    shader.setMat4("model", model);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 }
 
 
 // TRIANGLEMESH
+TriangleMesh::TriangleMesh(std::string file_location) {
+    this->loadModel(file_location);
+    this->setupGlBuffers();
+}
+
+TriangleMesh::~TriangleMesh() {
+    glDeleteBuffers(1, &EBO);
+}
 
 void TriangleMesh::loadModel(std::string file_location) {
     tinyobj::ObjReaderConfig reader_config;
@@ -269,9 +238,11 @@ void TriangleMesh::loadModel(std::string file_location) {
         offset_idx += num_mesh_indices;
     }
 
+    // In case undefined in obj file
     computeVertexNormals();
+}
 
-
+void TriangleMesh::setupGlBuffers() {
     // create buffers/arrays
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -280,11 +251,9 @@ void TriangleMesh::loadModel(std::string file_location) {
     glBindVertexArray(VAO);
     // load data into vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // A great thing about structs is that their memory layout is sequential for all its items.
-    // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
-    // again translates to 3/2 floats which translates to a byte array.
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
+    // Indices in EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
@@ -299,10 +268,6 @@ void TriangleMesh::loadModel(std::string file_location) {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coords));
     glBindVertexArray(0);
-
-
-    this->textures.push_back(std::make_unique<Texture>("../resources/white.png"));
-    this->textures.push_back(std::make_unique<Texture>("../resources/white.png"));
 }
 
 
@@ -325,17 +290,26 @@ void TriangleMesh::computeVertexNormals() {
 
 void TriangleMesh::draw(Shader& shader, const glm::vec3& position, const glm::vec3& scale) {
     // Bind textures
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        this->textures[i]->bind(GL_TEXTURE0 + i);
-    }
-    shader.setInt("material.diffuse", 0);
-    shader.setInt("material.specular", 1);
+    albedo.bind(GL_TEXTURE0);
+    shader.setInt("material.albedo", 0);
+    shader.setFloat("material.metallic", material.metallic);
+    shader.setFloat("material.roughness", material.roughness);
+    shader.setFloat("material.ao", material.ao);
 
-    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(scale));
-    model = glm::translate(model, position);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+    model = glm::scale(model, glm::vec3(scale));
     shader.setMat4("model", model);
     // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+glm::vec3 TriangleMesh::computeBoundingBox(glm::vec3 scale) {
+    glm::vec3 bbox(0.0f);
+    for (const Vertex& vertex : vertices) {
+        glm::vec3 scaled_pos = scale * vertex.pos;
+        bbox = glm::max(bbox, glm::abs(scaled_pos));
+    }
+    return bbox;
 }

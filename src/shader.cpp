@@ -87,7 +87,7 @@ unsigned int Shader::createShader(const char* file_path, ShaderType shader_type)
     try
     {
         // open files
-        shader_file.open(file_path);
+        shader_file.open(resources_path + file_path);
         std::stringstream shader_stream;
         // read file's buffer contents into streams
         shader_stream << shader_file.rdbuf();

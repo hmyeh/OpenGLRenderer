@@ -116,6 +116,10 @@ public:
     // For debugging
     unsigned int& getDepthCubemap(int index);
     const PointLight& getPointLight(int index);
+
+    void setPointLightPosition(int index, glm::vec3 pos) {
+        pointLights[index].position = pos;
+    }
 };
 
 

@@ -88,7 +88,7 @@ void LightMap<PointLight>::generateShadowMap() {
 template<>
 void LightMap<PointLight>::computeLightSpaceMatrices(PointLight& light, const glm::vec3& bbox) {
     float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
-    float near = 1.0f;
+    float near = 0.1f;
     glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, near, light.far);
 
     light.shadowTransforms[0] = shadowProj * glm::lookAt(light.position, light.position + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));

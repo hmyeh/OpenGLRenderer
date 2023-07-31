@@ -7,12 +7,15 @@
 #include "scene.h"
 #include "shader.h"
 #include "camera.h"
+#include "irradiancemap.h"
 
 
 enum RenderType {
 	DEFERRED,
 	FORWARD,
 	DEBUG_DEPTH_CUBEMAP,
+	DEBUG_IRRADIANCE_CUBEMAP,
+	DEBUG_BRDF_LUT,
 	COUNT // only for the count
 };
 
@@ -22,74 +25,24 @@ private:
 	unsigned int width, height;
 
 	// G Buffer shader
-	Shader geometryPassShader = Shader("../src/g_buffer.vert", "../src/g_buffer.frag");
-	Shader deferredLightingShader = Shader("../src/deferred_lighting.vert", "../src/deferred_lighting.frag");
+	Shader geometryPassShader = Shader("g_buffer.vert", "g_buffer.frag");
+	Shader deferredLightingShader = Shader("deferred_lighting.vert", "deferred_lighting.frag");
 
 	// Forward screen shader
-	Shader screenShader = Shader("../src/screen.vert", "../src/screen.frag");
+	Shader screenShader = Shader("screen.vert", "screen.frag");
 
 	// Blinn phong shader
-	Shader blinnPhongShader = Shader("../src/blinn_phong.vert", "../src/blinn_phong.frag");
+	Shader blinnPhongShader = Shader("blinn_phong.vert", "blinn_phong.frag");
+
+	// PBR shader
+	Shader pbrShader = Shader("pbr.vert", "pbr.frag");
 
 	// Debug skybox shader
-	Shader skyboxShader = Shader("../src/skybox.vert", "../src/skybox.frag");
+	Shader skyboxShader = Shader("skybox.vert", "skybox.frag");
 
-	// quad
-	float quadVertices[24] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-		// positions   // texCoords
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f,  1.0f, 1.0f
-	};
-
-	float skyboxVertices[108] = {
-		// positions          
-		-1.0f,  1.0f, -1.0f,
-		-1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		-1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f
-	};
+	// Meshes
+	ScreenQuad quad;
+	Skybox skybox;
 
 	// Gamma correction
 	float gamma = 2.2;
@@ -102,12 +55,11 @@ private:
 		0, 0, 0
 	);
 
+	IrradianceMap irradianceMap = IrradianceMap("../resources/newport_loft.hdr");
+	//IrradianceMap irradianceMap = IrradianceMap("../resources/Winter_Forest/WinterForest_Env.hdr");
+
 	// GL variables
 	unsigned int uboMatrices;
-	// screen quad VAO
-	unsigned int quadVAO, quadVBO;
-	// Skybox VAO
-	unsigned int skyboxVAO, skyboxVBO;
 
 	// Deferred rendering GL variables
 	unsigned int gBuffer;
@@ -116,12 +68,12 @@ private:
 	// Depth test buffer renderbufferobject
 	unsigned int gRbo;
 
-	// Forward rendering GL variables
-	unsigned int forwardFbo;
+	// Post process rendering GL variables
+	unsigned int screenFbo;
 	// Color texture buffer
-	unsigned int forwardColorbuffer;
+	unsigned int screenColorbuffer;
 	// Depth test and stencil buffer
-	unsigned int forwardRbo;
+	unsigned int screenRbo;
 public:
 	Renderer(unsigned int width, unsigned int height, Camera* camera);
 	~Renderer();
@@ -136,25 +88,26 @@ private:
 	// Refers to projection and view matrices
 	void setupMatrices();
 	void updateMatrices();
-	void setupScreenQuad();
+	//void setupScreenQuad();
 
 	// g buffer
 	void setupDeferredResources();
 	// Simple deferred rendering
 	void deferred(Scene& scene);
 
-	// Setup for post-processing screen quad
-	void setupForwardResources();
 	// Forward rendering
 	void forward(Scene& scene);
 
+	// Setup for post-processing screen quad
+	void setupPostProcResources();
 	void postProcess();
 
 	//TESTING FOR CUBEMAPS
 	void setupDebugCubemapResources();
 	void debugDepthCubemap(Scene& scene);
+	void debugIrradiancemap(Scene& scene);
+	void debugBrdfLUT(Scene& scene);
 
-	void deferredForward(Scene& scene);
 };
 
 #endif
